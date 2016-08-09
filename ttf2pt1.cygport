@@ -1,0 +1,51 @@
+NAME="ttf2pt1"
+VERSION=3.4.4
+RELEASE=1
+CATEGORY="Graphics"
+SUMMARY="TTF to Type1 converter"
+DESCRIPTION="TTF2PT1 converts most TrueType Fonts to an Adobe Type 1 .pfa
+file. And also the other font formats supported by the FreeType library to
+an Adobe Type 1 .pfa file. And the BDF fonts to an Adobe Type 1 .pfa file.
+Yet another use is as a hinting engine: feed it an unhinted or poorly
+hinted Adobe Type 1 font through the FreeType library and get it back with
+freshly generated hints."
+HOMEPAGE="http://ttf2pt1.sourceforge.net/"
+SRC_URI="mirror://sourceforge/ttf2pt1/ttf2pt1-${VERSION}.tgz"
+PATCH_URI="
+	http://pkgs.fedoraproject.org/cgit/rpms/ttf2pt1.git/plain/ttf2pt1-destdir.patch
+	http://pkgs.fedoraproject.org/cgit/rpms/ttf2pt1.git/plain/ttf2pt1-freetype.patch
+	http://pkgs.fedoraproject.org/cgit/rpms/ttf2pt1.git/plain/ttf2pt1-sed.patch
+	http://pkgs.fedoraproject.org/cgit/rpms/ttf2pt1.git/plain/ttf2pt1-doc.patch
+	3.4.4-warnings.patch
+"
+
+REQUIRES="t1utils"
+
+DIFF_EXCLUDES="convert *.1"
+
+src_compile() {
+	check_pkg_config FT freetype2
+
+	lndirs
+	cd ${B}
+	cygmake -j1 all \
+		CFLAGS_SYS="${CFLAGS} -D_GNU_SOURCE" \
+		CFLAGS_EXTT1ASM="-DEXTERNAL_T1ASM" \
+		CFLAGS_FT="-DUSE_FREETYPE ${FT_CFLAGS}" \
+		LIBS_FT="${FT_LIBS}"
+}
+
+src_install() {
+	cd ${B}
+	cyginstall -j1 \
+		INSTDIR=/usr MANDIR=/usr/share/man TXTFILES= \
+		OWNER=`id -un` GROUP=`id -gn`
+	# use system t1utils
+	find ${D}/usr/libexec/${NAME} -delete
+	# documentation in wrong location
+	find ${D}/usr/share/${NAME}/{app,other} -delete
+	# Remove scripts only used during build
+	rm -f ${D}/usr/share/${NAME}/scripts/{convert,convert.cfg.sample,frommap,html2man,inst_dir,inst_file,mkrel,unhtml}
+
+	dodoc ${S}/{CHANGES,COPYRIGHT,FONTS.html,README}*
+}

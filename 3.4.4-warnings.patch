@@ -1,0 +1,55 @@
+--- origsrc/ttf2pt1-3.4.4/ft.c	2016-08-09 13:35:44.656721400 -0500
++++ src/ttf2pt1-3.4.4/ft.c	2016-08-09 14:28:30.769003000 -0500
+@@ -458,7 +458,7 @@ static double lastx, lasty;
+ 
+ static int
+ outl_moveto(
+-	FT_Vector *to,
++	const FT_Vector *to,
+ 	void *unused
+ )
+ {
+@@ -478,7 +478,7 @@ outl_moveto(
+ 
+ static int
+ outl_lineto(
+-	FT_Vector *to,
++	const FT_Vector *to,
+ 	void *unused
+ )
+ {
+@@ -494,8 +494,8 @@ outl_lineto(
+ 
+ static int
+ outl_conicto(
+-	FT_Vector *control1,
+-	FT_Vector *to,
++	const FT_Vector *control1,
++	const FT_Vector *to,
+ 	void *unused
+ )
+ {
+@@ -515,9 +515,9 @@ outl_conicto(
+ 
+ static int
+ outl_cubicto(
+-	FT_Vector *control1,
+-	FT_Vector *control2,
+-	FT_Vector *to,
++	const FT_Vector *control1,
++	const FT_Vector *control2,
++	const FT_Vector *to,
+ 	void *unused
+ )
+ {
+--- origsrc/ttf2pt1-3.4.4/runt1asm.c	2000-11-15 13:30:57.000000000 -0600
++++ src/ttf2pt1-3.4.4/runt1asm.c	2016-08-09 14:09:58.629347600 -0500
+@@ -10,6 +10,8 @@
+ #ifdef EXTERNAL_T1ASM
+ 
+ #include <stdio.h>
++#include <stdlib.h>
++#include <unistd.h>
+ #include <errno.h>
+ 
+ FILE *ifp;
